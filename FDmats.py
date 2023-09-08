@@ -78,13 +78,13 @@ def LapDir(N, p=1):
 
     return mat
 
-
+"""
 def LapDirNS(N, idxs, p=1, per = False):
-    """
-    Prepares the 1D Laplacian operator for Dirichlet boundaries on non-simply connected
-    domains. Such as a 1D line with a hole in the middle. if per, then we assume that the 
-    "edges" of the domain are connected. I'm actually not sure this makes a difference.
-    """
+    
+    #Prepares the 1D Laplacian operator for Dirichlet boundaries on non-simply connected
+    #domains. Such as a 1D line with a hole in the middle. if per, then we assume that the 
+    #"edges" of the domain are connected. I'm actually not sure this makes a difference.
+    
     idxs1 = idxs.copy()
     idxs1.append(0)
     idxs1.append(idxs[-1]+1)
@@ -92,6 +92,28 @@ def LapDirNS(N, idxs, p=1, per = False):
     idxs2 = idxs.copy()
     idxs2.append(N-1)
     idxs2.append(idxs[0]-1)
+    coeffs = FDCentralCoeffs(p)
+    mat = sum(coeffs[i]*shiftOpsBCs(N,i, idxs1) for i in range(1,p+1))
+    mat += coeffs[0]*np.identity(N)
+    mat += sum(coeffs[i]*shiftOpsBCs(N, -i, idxs2) for i in range(1,p+1))
+    return mat
+"""
+
+def LapDirNS(N, idxs, p=1, per = False):
+    """
+        Prepares the 1D Laplacian operator for Dirichlet boundaries on non-simply connected
+        domains. Such as a 1D line with a hole in the middle. if per, then we assume that the 
+        edges of the domain are connected. I'm actually not sure this makes a difference.
+    """
+    idxs1 = idxs.copy()
+    idxs1.append(0)
+    idxs1.append(idxs[-1]+1)
+    
+    print(idxs1)
+    idxs2 = idxs.copy()
+    idxs2.append(N-1)
+    idxs2.append(idxs[0]-1)
+    print(idxs2)
     mat = -2*np.identity(N) + .5*(shiftOps(N,1) + shiftOps(N,1)@refOp(N, idxs2) + shiftOps(N,-1) + shiftOps(N,-1)@refOp(N, idxs1) )
     #return .5*(mat + refOp(N, idxs[1: len(idxs)-1])@mat)
     return mat
@@ -112,7 +134,7 @@ def Lap1d(N, bcs, p =1, idxs = None):
     if bcs == 'dir':
         return LapDir(N, p)
     if bcs == 'dirNS':
-        return LapDirNS(N, idxs)
+        return LapDirNS(N, p, idxs)
 
 def ConvectiveTerm1d(N, bcs, func, p = 1, idxs = None):
     if idxs is None:
@@ -161,22 +183,6 @@ What information is needed by the user to produce this automatically?
 Get GradVGrad term of order p implemented with appropriate boundary conditions. For example, we would probably need to perform an LCU of V operators as:
 V' = V + V@refOp(N, bndryIdxs), so that the rows that have only a diagonal entry have still the value -2H(n,p) from the Laplacian. Additionally, the 
 gradient operators themselves will need to be constructed to have the entries cancel on the super and sub diagonals on those same rows.
-
 """
 
 
-N = 16
-D1 = ForwardDiffDir(N,2)
-D2 = BackwardDiffDir(N,2)
-plt.imshow(D1@D2)
-plt.show()
-
-L = LapDir(N, p=5)
-plt.imshow(L)
-plt.show()
-
-plt.imshow(L - D1@D2)
-plt.show()
-d = .5*1/N
-coul = partial(Coulomb, delta = d)
-Vlj = partial(LJ, delta = d)

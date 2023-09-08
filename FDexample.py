@@ -1,4 +1,5 @@
 from FDmats import *
+import numpy as np
 """
 #Example, 10 grid points in X and Y directions
 # The box of points {(4,3), (6,3), (4,6), (6,6)} 
@@ -28,22 +29,15 @@ B2 = A2
 B3 = A3
 
 #The operator is formed by a sequence of 1d Laplacians
-T1 = Lap1d(Nx, 'dirNS', A2)
 
 Dx = (np.kron(Lap1d(Nx, 'per'), sigMat(Ny, B1)) + np.kron(Lap1d(Nx, 'dirNS', A2), sigMat(Ny, B2)) + np.kron(Lap1d(Nx, 'per'), sigMat(Ny, B3)))
-Dy = (np.kron(sigMat(Nx, A1), Lap1d(Ny, 'per')) + np.kron(sigMat(Nx, A2), Lap1d(Ny, 'dirNS', B2)) + np.kron(sigMat(Nx, A3), Lap1d(Ny, 'per')))
+Dy = (np.kron(sigMat(Nx, A1), Lap1d(Ny, 'dir')) + np.kron(sigMat(Nx, A2), Lap1d(Ny, 'dirNS', B2)) + np.kron(sigMat(Nx, A3), Lap1d(Ny, 'per')))
 L2 = .5*(Dx + Dy)
+
 """
 #The boundary conditions are formed by rhs = 0 if the index is on the interior boundary nodes
 
 #BC's =1 on [A2]x[B2]
-x_vec = np.zeros(Nx)
-x_vec[A2[:]] = 2
-
-y_vec = np.zeros(Ny)
-y_vec[B2[:]] = 2
-"""
-
 x_vec = np.zeros(Nx)
 x_vec[0] = 2
 x_vec[-1] = 2
@@ -51,6 +45,14 @@ x_vec[-1] = 2
 y_vec = np.zeros(Nx)
 y_vec[0] = 2
 y_vec[-1] = 2
+
+"""
+
+x_vec = np.zeros(Nx)
+x_vec[A2[:]] = 2
+
+y_vec = np.zeros(Ny)
+y_vec[B2[:]] = 2
 
 rhs_vec = -1.*np.kron(x_vec,y_vec)
 
@@ -70,3 +72,15 @@ axes.plot_surface(X, Y, q2d)
   
 plt.show()
 
+
+"""
+
+d = .5*1/N
+coul = partial(Coulomb, delta = d)
+Vlj = partial(LJ, delta = d)
+
+L1 = (shiftOps(N,1) - shiftOps(N,-1))@PotentialOp(N, coul)
+
+L2 = ForwardDiffPer(N)@PotentialOp(N, coul)@BackwardDiffPer(N)
+
+"""
