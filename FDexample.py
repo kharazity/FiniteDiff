@@ -24,8 +24,8 @@ A2 = [x for x in range(Nl,Nr)]
 A3 = [x for x in range(Nr,Nx)]
 
 Ny = Nx
-B1 = A1
-B2 = A2
+B1 = A2
+B2 = A1
 B3 = A3
 
 #The operator is formed by a sequence of 1d Laplacians
@@ -38,6 +38,15 @@ L2 = .5*(Dx + Dy)
 #The boundary conditions are formed by rhs = 0 if the index is on the interior boundary nodes
 
 #BC's =1 on [A2]x[B2]
+
+x_vec = np.zeros(Nx)
+x_vec[A2[:]] = 2
+
+y_vec = np.zeros(Ny)
+y_vec[B2[:]] = 2
+"""
+
+
 x_vec = np.zeros(Nx)
 x_vec[0] = 2
 x_vec[-1] = 2
@@ -46,13 +55,6 @@ y_vec = np.zeros(Nx)
 y_vec[0] = 2
 y_vec[-1] = 2
 
-"""
-
-x_vec = np.zeros(Nx)
-x_vec[A2[:]] = 2
-
-y_vec = np.zeros(Ny)
-y_vec[B2[:]] = 2
 
 rhs_vec = -1.*np.kron(x_vec,y_vec)
 

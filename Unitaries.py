@@ -1,4 +1,27 @@
 import numpy as np
+import scipy as sp
+from scipy.fft import dct, idct, dst, idst, fft, ifft
+
+
+def DFT(N):
+    return fft(sp.eye(N), axis = 0)
+
+def iDFT(N):
+    return ifft(sp.eye(N), axis = 0)
+
+def DCT(N):
+    return dct(np.eye(N), axis = 0)
+
+def iDCT(N):
+    return idct(np.eye(N), axis = 0)
+
+def DST(N):
+    return dst(np.eye(N), axis = 0)
+
+def iDST(N):
+    return idst(np.eye(N), axis = 0)
+
+
 def shiftOps(N, pow):
     """
     with pow = j,
@@ -41,3 +64,4 @@ def sigMat(N, idxs):
     This prepares the matrix with ones on the diagonal elements in idxs
     """
     return .5*(np.identity(N) - refOp(N,idxs))
+

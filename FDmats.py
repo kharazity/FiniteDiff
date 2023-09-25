@@ -8,6 +8,8 @@ from FDCoeffs import *
 from potentials import *
 from Unitaries import *
 
+np
+
  
 def ForwardDiffPer(N, p = 1):
     mat = np.zeros((N,N))
@@ -119,8 +121,9 @@ def LapDirNS(N, idxs, p=1, per = False):
     return mat
 
 
-def Lap1d(N, bcs, p =1, idxs = None):
+def Lap1d(N, bcs = 'per', p =1, idxs = None):
     """
+    bcs in {'per', 'dir', 'dirNS'} for periodic, dirichlet, and nonsimply connected dirichlet boundary conditions
     idxs are the nodes where boundary conditions are enforced
     For example, for end point boundary conditions you'd input [0,N-1], with the left most-boundary point entered first in the list
     idxs[0] < idxs[1] for this to work.
