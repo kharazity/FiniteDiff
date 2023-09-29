@@ -34,20 +34,15 @@ def shiftOps(N, pow):
         arr[(i+pow)%N, i] = 1
     return arr
 
-def shiftOpsBCs(N, pow, idxs):
+def shiftOpsBCs(N, pow, idxs, NS = False):
+    """
+    Not quite this simple for the Non-Simply connected problem.
+    One needs to think about, when dealing with not only the nodes
+    on the interior, but also the points just outside
+    """
     op = .5*shiftOps(N, pow)
-    op += .5*shiftOps(N, pow)@refOp(N, idxs)
+    op += .5*shiftOps(N, pow)@refOp(N, [(x-pow)%N for x in idxs])
     return op
-
-def shiftOpsNP(N, pow):
-    op = shiftOps(N, pow)
-    if pow == 0:
-        return op
-    elif pow > 0:
-        op += shiftOps(N, pow)@refOp(N, [N - pow-1] + [x for x in range(N-pow, N)])
-    else:
-        op += shiftOps(N, pow)@refOp(N, [-pow]+[x for x in range(0,-pow)])
-    return .5*op
 
 def refOp(N,idxs):
     """
@@ -61,7 +56,28 @@ def refOp(N,idxs):
 
 def sigMat(N, idxs):
     """
-    This prepares the matrix with ones on the diagonal elements in idxs
+        This prepares the matrix with ones on the diagonal elements in idxs
     """
     return .5*(np.identity(N) - refOp(N,idxs))
 
+
+Zp = np.array([[1,0],[0,-1]])
+def Znj(n,j):
+    """
+        Constructs the pauli Z operator on n qubits acting on the jth site
+    """
+    Inj = np.eye(2**(j-1))
+    In = np.eye(2**(n-j))
+    return np.kron(np.kron(In, Zp),Inj)
+
+def oneBodyPosOp(N):
+    """
+        Follows the construction given in Lemma 24 of Quantum Simulatoin of the First-Quantized Pauli-Fierz Hamiltonian.
+        The subnormalization factor is alpha = N-1
+    """
+    n = int(np.log2(N))
+    X = (2**n - 1)/2*np.eye(N) - 1/2*sum([2**j*Znj(n,j+1) for j in range(0,n)])
+    X *= 1/(N-1)
+    return X
+
+    

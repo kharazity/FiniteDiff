@@ -21,6 +21,13 @@ def FDCentralCoeffs(p):
             coeffs.append(coeff(p,i))
     return coeffs
 
+def subNormFactor(p):
+    coeffs = FDCentralCoeffs(p)
+    s = 0
+    for x in coeffs:
+        s+= abs(x)
+    return s
+
 def FDForwardCoeffs(p):
     coeffs = findiff.coefficients(deriv=1,offsets=[x for x in range(0,2*p)], symbolic=False)['coefficients']
     return coeffs
