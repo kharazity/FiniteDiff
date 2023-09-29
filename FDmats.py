@@ -1,14 +1,14 @@
 #%%
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from functools import partial
-
-
 from FDCoeffs import *
 from potentials import *
 from Unitaries import *
 
+
+def basisVec(n,j):
+    b = np.zeros(n)
+    b[j] = 1.
+    return b
 
 def kronSum(*mats):
     """
@@ -163,18 +163,4 @@ V' = V + V@refOp(N, bndryIdxs), so that the rows that have only a diagonal entry
 gradient operators themselves will need to be constructed to have the entries cancel on the super and sub diagonals on those same rows.
 """
 #%%
-def basisVec(n,j):
-    b = np.zeros(n)
-    b[j] = 1.
-    return b
-N = 20
-idxs = range(21,35)
-L = Lap1d(N, bcs='dirNS', p = 6, idxs = idxs)
-plt.imshow(L)
-plt.show()
-b = np.zeros(N)
-b[idxs] = 1.
-from numpy.linalg import *
-b*=1/norm(b)
-print(b@L.T@L@b)
 #%%

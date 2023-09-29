@@ -69,15 +69,3 @@ def Znj(n,j):
     Inj = np.eye(2**(j-1))
     In = np.eye(2**(n-j))
     return np.kron(np.kron(In, Zp),Inj)
-
-def oneBodyPosOp(N):
-    """
-        Follows the construction given in Lemma 24 of Quantum Simulatoin of the First-Quantized Pauli-Fierz Hamiltonian.
-        The subnormalization factor is alpha = N-1
-    """
-    n = int(np.log2(N))
-    X = (2**n - 1)/2*np.eye(N) - 1/2*sum([2**j*Znj(n,j+1) for j in range(0,n)])
-    X *= 1/(N-1)
-    return X
-
-    
