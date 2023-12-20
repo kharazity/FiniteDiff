@@ -34,12 +34,9 @@ def shiftOps(N, pow):
         arr[(i+pow)%N, i] = 1
     return arr
 
-def shiftOpsBCs(N, pow, idxs, NS = False):
-    """
-    Not quite this simple for the Non-Simply connected problem.
-    One needs to think about, when dealing with not only the nodes
-    on the interior, but also the points just outside
-    """
+def shiftOpsBCs(N, pow, idxs = None):
+    if idxs == None:
+        idxs = [0, N-1]
     op = .5*shiftOps(N, pow)
     op += .5*shiftOps(N, pow)@refOp(N, [(x-pow)%N for x in idxs])
     return op

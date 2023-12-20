@@ -26,3 +26,15 @@ def Harmonic(r):
 
 def PolyN(r,n):
     return (r)**n
+
+def DLeft(N, Func, bcs = None, p = 1):
+    """
+    This function produces a diagonal matrix that approximates the function $\nabla V$ evaluated on a finite lattice of points and the derivative
+    approximated with a finite difference scheme of order $p$. The diagonal matrix is just the matrix formed from placing the values of the vector V_i
+    into a matrix V_{ii}
+    N is the number of grid points
+    Func, is the potential function we wish to evaluate
+    bcs = boundary conditions, can be periodic, dirichlet, and Non-simple dirichlet,
+    p = order of finite difference stencil used
+    """
+    return None

@@ -4,6 +4,10 @@ from FDCoeffs import *
 from potentials import *
 from Unitaries import *
 
+def uniform(N):
+    return 1/np.sqrt(N)*np.ones(N)
+
+
 
 def basisVec(n,j):
     b = np.zeros(n)
@@ -32,7 +36,22 @@ def kronSum(*mats):
         i+=1
     return sum
 
-
+def kronSumArr(matList):
+    dims = [mat.shape[0] for mat in matList]
+    leftDims = lambda i : int(np.prod(dims[0:i]))
+    rightDims = lambda i : int(np.prod(dims[i+1:]))
+    total_dim = np.prod(dims)
+    sum = np.zeros((total_dim,total_dim))
+    i = 0
+    for mat in matList:
+        if i == 0:
+            sum += np.kron(mat, np.identity(rightDims(0)))
+        elif i == len(dims):
+            sum += np.kron(np.identity(leftDims(-1)), mat)
+        else:
+            sum += np.kron(np.kron(np.identity(leftDims(i)),mat),np.identity(rightDims(i)))
+        i+=1
+    return sum
  
 def ForwardDiffPer(N, p = 1):
     mat = np.zeros((N,N))
@@ -57,7 +76,7 @@ def BackwardDiffPer(N, p = 1):
 def ForwardDiffDir(N, p = 1):
     mat = np.zeros((N,N))
     coeffs = FDForwardCoeffs(p)
-    shifts = np.array([shiftOpsNP(N,i) for i in range(0,2*p)])
+    shifts = np.array([shiftOpsBCs(N,i) for i in range(0,2*p)])
     i = 0
     for c in coeffs:
         mat += c*shifts[i]
@@ -67,20 +86,14 @@ def ForwardDiffDir(N, p = 1):
 def BackwardDiffDir(N, p = 1):
     mat = np.zeros((N,N))
     coeffs = FDForwardCoeffs(p)
-    shifts = np.array([shiftOpsNP(N,i) for i in range(-2*p+1,1)])
+    shifts = np.array([shiftOpsBCs(N,i) for i in range(-2*p+1,1)])
     i = 0
     for c in coeffs:
         mat += c*shifts[i]
         i += 1
     return mat
 
-def ForwardDiffNS(N, idxs, p = 1):
 
-    return 
-
-def BackwardDiffNS(N,idxs, p = 1):
-
-    return
 
 def LapPer(N,p=1):
     """
@@ -97,9 +110,9 @@ def LapDir(N, p=1):
         Prepares the 1D Laplacian operator with Dirichlet boundary with a 2p+1 finite difference stencil
     """
     coeffs = FDCentralCoeffs(p)
-    mat = sum(coeffs[i]*shiftOpsNP(N, i) for i in range(1,p+1))
+    mat = sum(coeffs[i]*shiftOps(N, i) for i in range(1,p+1))
     mat+= coeffs[0]*np.identity(N)
-    mat += sum(coeffs[i]*shiftOpsNP(N, -i) for i in range(1, p+1))
+    mat += sum(coeffs[i]*shiftOps(N, -i) for i in range(1, p+1))
 
     return mat
 
@@ -110,9 +123,9 @@ def LapDirNS(N, idxs, p=1, per = False):
     #domains. Such as a 1D line with a hole in the middle for a stencil with 2p+1 nodes. if per, then we assume that the 
     #"edges" of the domain are connected. 
     coeffs = FDCentralCoeffs(p)
-    mat = sum(coeffs[i]*shiftOpsBCs(N, i, idxs,NS=True) for i in range(1,p+1))
+    mat = sum(coeffs[i]*shiftOpsBCs(N, i, idxs) for i in range(1,p+1))
     mat += coeffs[0]*np.identity(N)
-    mat += sum(coeffs[i]*shiftOpsBCs(N, -i, idxs,NS=True) for i in range(1,p+1))
+    mat += sum(coeffs[i]*shiftOpsBCs(N, -i, idxs) for i in range(1,p+1))
     return mat
 
 
@@ -143,7 +156,7 @@ def Lap1d(N, bcs = 'per', p =1, idxs = None):
     if bcs == 'per':
         return LapPer(N,p)
     if bcs == 'dir':
-        return LapDir(N, p)
+        return LapDirNS(N, idxs, p)
     if bcs == 'dirNS':
         return LapDirNS(N, idxs, p)
 

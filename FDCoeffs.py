@@ -16,10 +16,12 @@ def FDCentralCoeffs(p):
     coeffs = []
     for i in range(p+1):
         if i == 0:
-            coeffs.append(-2*HarmonicN(p, 2))
+            coeffs.append(-2*np.sum([coeff(p,j) for j in range(1,p+1)]))
         else:
             coeffs.append(coeff(p,i))
     return coeffs
+def CentralPoint(p):
+    return -2*np.sum([coeff(p,j) for j in range(1,p+1)])
 
 def subNormFactor(p):
     coeffs = FDCentralCoeffs(p)
